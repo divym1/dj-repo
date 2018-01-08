@@ -32,19 +32,16 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jfree.chart.axis.Tick;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 
 import com.opencsv.CSVReader;
 import com.plank.process.server.dao.EquityDataDao;
 import com.plank.process.server.dao.EquityDataDaoImpl;
-import com.plank.process.server.indicator.ADXIndicatorDaily;
 import com.plank.process.server.indicator.EMAIndicatorNewDaily;
 import com.plank.process.server.indicator.SMAIndicatorNewDaily;
 import com.plank.process.server.model.Decimal;
@@ -55,8 +52,6 @@ import com.plank.process.server.service.DaoController;
  * This class build a Ta4j time series from a CSV file containing ticks.
  */
 public class CsvTicksLoader {
-
-	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
 	public static void main(String[] args) {
 
@@ -83,7 +78,6 @@ public class CsvTicksLoader {
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
 		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 
-		List<Tick> ticks = new ArrayList<>();
 
 		InputStreamReader inputStreamReader = new InputStreamReader(stream, Charset.forName("UTF-8"));
 
@@ -120,13 +114,13 @@ public class CsvTicksLoader {
 
 					List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
 					
-//					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
-//					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
+					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
+					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
 					
-//					equityDataDao.insertIntoEquityData(equityDataDO);
-//					
-					ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
-					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, 14);
+					equityDataDao.insertIntoEquityData(equityDataDO);
+					
+//					ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
+//					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, 14);
 
 				}
 			}

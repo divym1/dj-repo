@@ -8,7 +8,6 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.math3.util.Decimal64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;

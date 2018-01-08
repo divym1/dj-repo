@@ -17,6 +17,10 @@ import com.plank.process.server.model.EquityDataDO;
 public class IndicatorAlgo {
 	
 	
+	public String getSymbol() {
+		return "ASHOKLEY";
+	}
+	
 	public static void matchSMAEMA() {
 		
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
@@ -24,11 +28,12 @@ public class IndicatorAlgo {
 
 		List<String> symbolList = equityDataDao.getAllSymbolsForLargeCap();
 		
+		System.out.println("Large cap " + symbolList.size());
+		
 		List<String> matchedsymbols = new ArrayList<>();
 		
 		Calendar cal = new GregorianCalendar(); 
-		
-		cal.set(2017, 9, 27);
+		cal.set(2017, 8, 28);
 		
 		for (String symbol : symbolList) {
 			List<EquityDataDO> dataList = equityDataDao.getEquityData(symbol, new Date(cal.getTimeInMillis()));
@@ -46,7 +51,13 @@ public class IndicatorAlgo {
 		
 		for (String matchedSymbol : matchedsymbols) {
 			System.out.println("Matched Symbol : " +matchedSymbol);
+			
+			// get the adx value and filter with values greater then 20 .
+			
+			// 
 		}
+		
+		
 	}
 	
 	
