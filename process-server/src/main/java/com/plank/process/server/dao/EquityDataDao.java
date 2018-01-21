@@ -6,10 +6,13 @@ import java.util.List;
 import com.plank.process.server.model.ADXDataDO;
 import com.plank.process.server.model.Decimal;
 import com.plank.process.server.model.EquityDataDO;
+import com.plank.process.server.model.UltiOsciDO;
 
 public interface EquityDataDao {
 
 	public void insertIntoEquityData(EquityDataDO equityDataDO);
+	
+	public void insertUltiOsci(UltiOsciDO ultiOsciDO);
 
 	public List<EquityDataDO> getEquityData(String symbol, Date date);
 
@@ -34,4 +37,6 @@ public interface EquityDataDao {
 	public List<ADXDataDO> getADXRecord(String symbol, Date date);
 	
 	public List<ADXDataDO> getADXRecord(String symbol);
+	
+	public List<UltiOsciDO> getUORecord(String symbol, Date date);
 }

@@ -11,12 +11,15 @@ public class BaseAdxIndicator {
 		Decimal maxPrice = currentDateDO.getHigh();
 		Decimal prevMinPrice = prevDataDO.getLow();
 		Decimal minPrice = currentDateDO.getLow();
-
-		if ((prevMaxPrice.isGreaterThanOrEqual(maxPrice) && prevMinPrice.isLessThanOrEqual(minPrice))
-				|| maxPrice.minus(prevMaxPrice).isGreaterThanOrEqual(prevMinPrice.minus(minPrice))) {
-			return Decimal.ZERO;
+		
+		Decimal upMove = maxPrice.minus(prevMaxPrice);
+		Decimal downMove = prevMinPrice.minus(minPrice);
+		
+		if(downMove.isGreaterThan(upMove) && downMove.isGreaterThan(Decimal.ZERO)) {
+			return downMove;
 		}
-		return prevMinPrice.minus(minPrice);
+
+		return Decimal.ZERO;
 	}
 
 	public static Decimal calculateDirectionalMovementPlus(EquityDataDO currentDateDO, EquityDataDO prevDataDO) {
@@ -26,25 +29,24 @@ public class BaseAdxIndicator {
 		Decimal prevMinPrice = prevDataDO.getLow();
 		Decimal minPrice = currentDateDO.getLow();
 
-		if ((maxPrice.isLessThan(prevMaxPrice) && minPrice.isGreaterThan(prevMinPrice))
-				|| prevMinPrice.minus(minPrice).isEqual(maxPrice.minus(prevMaxPrice))) {
-			return Decimal.ZERO;
+		Decimal upMove = maxPrice.minus(prevMaxPrice);
+		Decimal downMove = prevMinPrice.minus(minPrice);
+		
+		if(upMove.isGreaterThan(downMove) && upMove.isGreaterThan(Decimal.ZERO)) {
+			return upMove;
 		}
-
-		if (maxPrice.minus(prevMaxPrice).isGreaterThan(prevMinPrice.minus(minPrice))) {
-			return maxPrice.minus(prevMaxPrice);
-		}
-
+		
 		return Decimal.ZERO;
 	}
 
-	public static Decimal getTrueRange(EquityDataDO currentDateDO, EquityDataDO prevDataDO) {
+	public static Decimal getTrueRange(EquityDataDO equityDataDO) {
 
-		Decimal ts = currentDateDO.getHigh().minus(currentDateDO.getLow());
-		Decimal ys = currentDateDO.getHigh().minus(prevDataDO.getClosePrice());
-		Decimal yst = prevDataDO.getClosePrice().minus(currentDateDO.getLow());
-
-		return ts.abs().max(ys.abs()).max(yst.abs());
+		double min = Math.min(equityDataDO.getLow().toDouble(), equityDataDO.getPrevClosePrice().toDouble());
+		double maxHighPriClose = Math.max(equityDataDO.getHigh().toDouble(), equityDataDO.getPrevClosePrice().toDouble());
+		Decimal trToday = Decimal.valueOf(maxHighPriClose).minus(Decimal.valueOf(min));
+		
+		return trToday;
+		
 	}
 
 }

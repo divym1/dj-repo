@@ -35,15 +35,17 @@ public class ADXIndicator extends BaseAdxIndicator {
 			List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
 			
 			if(! (equityDataList.size() > 30)) {
-				System.out.println("Not calculating as the data is not sufficient" + symbol);
+				System.out.println("NO DATA");
 				continue;
 			}
 			Collections.sort(equityDataList, new DataComparatorAscending());
 
+			
+			
 			EquityDataDO prevDataDO0 = equityDataList.get(0);
 			EquityDataDO currentDateDO1 = equityDataList.get(1);
 
-			Decimal trueRangeCurrent1 = getTrueRange(currentDateDO1, prevDataDO0);
+			Decimal trueRangeCurrent1 = getTrueRange(currentDateDO1);
 
 			// Calculate directional movement UP
 			Decimal dmPlusCurrent1 = calculateDirectionalMovementPlus(currentDateDO1, prevDataDO0);
@@ -51,19 +53,12 @@ public class ADXIndicator extends BaseAdxIndicator {
 			// Calculate directional movement DOWN
 			Decimal dmMinusCurrent1 = calculateDirectionalMovementMinus(currentDateDO1, prevDataDO0);
 
-			ADXDataDO adxDataDO0 = new ADXDataDO();
-			adxDataDO0.setDmMinusCurrent(Decimal.ZERO);
-			adxDataDO0.setDmPlusCurrent(Decimal.ZERO);
-			adxDataDO0.setTrueRangeCurrent(Decimal.ZERO);
-			adxDataDO0.setValueDate(prevDataDO0.getValueDate());
-			adxDataDO0.setSymbol(prevDataDO0.getSymbol());
-
 			ADXDataDO adxDataDO1 = new ADXDataDO();
 			adxDataDO1.setDmMinusCurrent(dmMinusCurrent1);
 			adxDataDO1.setDmPlusCurrent(dmPlusCurrent1);
 			adxDataDO1.setTrueRangeCurrent(trueRangeCurrent1);
 			adxDataDO1.setValueDate(currentDateDO1.getValueDate());
-			adxDataDO0.setSymbol(currentDateDO1.getSymbol());
+			adxDataDO1.setSymbol(currentDateDO1.getSymbol());
 
 			List<ADXDataDO> adxDataList = new ArrayList<>(equityDataList.size());
 			// starting from 2 as we calculated for index 1 above. No data for
@@ -77,7 +72,7 @@ public class ADXIndicator extends BaseAdxIndicator {
 				EquityDataDO currentDateDO = equityDataList.get(i);
 
 				// Calculate TR
-				Decimal trueRangeCurrent = getTrueRange(currentDateDO, prevDataDO);
+				Decimal trueRangeCurrent = getTrueRange(currentDateDO);
 
 				// Calculate directional movement UP
 				Decimal dmPlusCurrent = calculateDirectionalMovementPlus(currentDateDO, prevDataDO);
@@ -93,8 +88,9 @@ public class ADXIndicator extends BaseAdxIndicator {
 				adxDataDO.setSymbol(currentDateDO.getSymbol());
 
 				adxDataList.add(i, adxDataDO);
+				
 			}
-
+			
 			// DX value calculation.
 			for (int i = 15; i < adxDataList.size(); i++) {
 				// this part should start when there is enough data.
@@ -128,19 +124,24 @@ public class ADXIndicator extends BaseAdxIndicator {
 
 				dmMinusSmooth = dmMinusPeriod.minus((dmMinusPeriod.dividedBy(Decimal.valueOf(timeframe)))).plus(adxDataDO.getDmMinusCurrent());
 
+//				System.out.println("TR - "+ trSmooth + " | dm plus - "+ dmPlusSmooth + " | dm minus - "+ dmMinusSmooth);
+				
 				// calculate directional index
 
-				diPlus = dmPlusSmooth.dividedBy(trSmooth).multipliedBy(Decimal.HUNDRED);
-				diMinus = dmMinusSmooth.dividedBy(trSmooth).multipliedBy(Decimal.HUNDRED);
+				diPlus = (dmPlusSmooth.dividedBy(trSmooth)).multipliedBy(Decimal.HUNDRED);
+				diMinus = (dmMinusSmooth.dividedBy(trSmooth)).multipliedBy(Decimal.HUNDRED);
 
+//				System.out.println("diPlus - "+ diPlus + " | diMinus - "+ diMinus);
+				
 				// calculate the directional difference
 
 				Decimal diDiff = diPlus.minus(diMinus);
 				Decimal diSum = diPlus.plus(diMinus);
 
 				// Calculate todays DX
-				dxToday = diDiff.abs().dividedBy(diSum).multipliedBy(Decimal.HUNDRED);
+				dxToday = (diDiff.dividedBy(diSum)).multipliedBy(Decimal.HUNDRED);
 
+				
 				adxDataDO.setAdxPeriod(adxPeriod);
 				adxDataDO.setAdxToday(adxToday);
 				adxDataDO.setDiMinus(diMinus);
@@ -159,10 +160,10 @@ public class ADXIndicator extends BaseAdxIndicator {
 
 			// calculating ADX from 30 days data.
 			
-			int k = 15;
+			int k = 16;
 			Decimal dxFor14Day = Decimal.ZERO;
 
-			while (k < 29) {
+			while (k <= 29) {
 				ADXDataDO adxDataDO = adxDataList.get(k);
 				dxFor14Day = dxFor14Day.plus(adxDataDO.getDxToday());
 				k++;
@@ -170,16 +171,12 @@ public class ADXIndicator extends BaseAdxIndicator {
 
 			Decimal avgOfDx = dxFor14Day.dividedBy(Decimal.valueOf(14));
 
+
 			adxDataList.get(29).setAdxToday(avgOfDx);
 
 			for (int i = 30; i < adxDataList.size(); i++) {
-
 				Decimal dxToday = adxDataList.get(i).getDxToday();
 				Decimal adxPrev = adxDataList.get(i - 1).getAdxToday();
-
-				System.out.println("Symbol : " + symbol + " || current date : " + adxDataList.get(i).getValueDate());
-
-				System.out.println("dxToday " + dxToday);
 
 				Decimal adxToday = ((adxPrev.multipliedBy(Decimal.valueOf(timeframe - 1))).plus(dxToday)).dividedBy(Decimal.valueOf(timeframe));
 				adxDataList.get(i).setAdxToday(adxToday);
@@ -188,6 +185,7 @@ public class ADXIndicator extends BaseAdxIndicator {
 
 			for (ADXDataDO adxDataDO2 : adxDataList) {
 				if (adxDataDO2 != null) {
+					System.out.println(adxDataDO2);
 					equityDataDao.insertADXRecord(adxDataDO2);
 				}
 			}

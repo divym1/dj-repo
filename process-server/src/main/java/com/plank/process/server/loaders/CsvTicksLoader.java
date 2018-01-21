@@ -42,6 +42,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import com.opencsv.CSVReader;
 import com.plank.process.server.dao.EquityDataDao;
 import com.plank.process.server.dao.EquityDataDaoImpl;
+import com.plank.process.server.indicator.ADXIndicatorDaily;
 import com.plank.process.server.indicator.EMAIndicatorNewDaily;
 import com.plank.process.server.indicator.SMAIndicatorNewDaily;
 import com.plank.process.server.model.Decimal;

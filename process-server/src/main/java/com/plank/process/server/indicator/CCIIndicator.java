@@ -41,9 +41,9 @@ public class CCIIndicator {
 		Decimal absoluteDeviations = Decimal.ZERO;
 		final Decimal average = currentDateDO.getSmaValue();
 		
-//		for (int i = 0; i < timeFrame; i++) {
-//			absoluteDeviations = absoluteDeviations.plus(listOfPrevEquData.get(i).getTypicalPrice().minus(average).abs());
-//		}
+		for (int i = 0; i < timeFrame; i++) {
+			absoluteDeviations = absoluteDeviations.plus(listOfPrevEquData.get(i).getTypicalPrice().minus(average).abs());
+		}
 		
 		return absoluteDeviations.dividedBy(Decimal.valueOf(timeFrame));
 	}

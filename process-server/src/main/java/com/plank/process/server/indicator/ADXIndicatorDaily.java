@@ -26,12 +26,12 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 	 * @param timeFrame
 	 * @return
 	 */
-	public Decimal calculateADX(EquityDataDO currentDateDO, List<EquityDataDO> listOfPrevEquData, int timeFrame) {
+	public Decimal calculateADX(EquityDataDO currentDateDO, List<EquityDataDO> listOfPrevEquData, int timeFrame, EquityDataDao equityDataDao) {
 
 		EquityDataDO prevDataDO = listOfPrevEquData.get(0);
 
 		// Calculate TR
-		Decimal trueRangeCurrent = getTrueRange(currentDateDO, prevDataDO);
+		Decimal trueRangeCurrent = getTrueRange(currentDateDO);
 
 		// Calculate directional movement UP
 		Decimal dmPlusCurrent = calculateDirectionalMovementPlus(currentDateDO, prevDataDO);
@@ -46,8 +46,6 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		Decimal dmMinusPeriod = Decimal.ZERO;
 		Decimal adxPeriod = Decimal.ZERO;
 		
-		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
-		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 		
 		List<ADXDataDO > adxDataList = equityDataDao.getADXRecord(currentDateDO.getSymbol());
 
@@ -109,7 +107,9 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		adxDataDO.setTrPeriod(trPeriod);
 		adxDataDO.setTrSmooth(trSmooth);
 
-		equityDataDao.insertADXRecord(adxDataDO);
+		
+		System.out.println(adxDataDO);
+//		equityDataDao.insertADXRecord(adxDataDO);
 		
 		return adxToday;
 	}
@@ -117,19 +117,23 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 	public static void main(String[] args) {
 		
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
-		EquityDataDao equityDataDao  = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
-		
-		Calendar calendar = new GregorianCalendar(2017, 10, 1);
+		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 
-		EquityDataDO currentDateDO = new  EquityDataDO("ASHOKLEY", "EQ", Decimal.ZERO, Decimal.valueOf(129.15), Decimal.ZERO, Decimal.ZERO,
-				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, null, Decimal.ZERO, "ASK", new Date(calendar.getTimeInMillis()),
-				Decimal.ZERO, Decimal.ZERO);
-		
-		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", null);
-		
+		Calendar cal = new GregorianCalendar(); 
+
 		ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
-		adxIndicatorDaily.calculateADX(currentDateDO, equityDataList, 20);
-	}
+		
+		for(int i= 2; i <= 10 ; i ++) {
+		
+			cal.set(2017, 10, i);
+			List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", new Date(cal.getTimeInMillis()));
 
+			if(equityDataList != null && equityDataList.size()> 0) {
+				EquityDataDO currentDateDO = equityDataList.get(0);
+				adxIndicatorDaily.calculateADX(currentDateDO, equityDataList, 20, equityDataDao);
+			}
+		}		
+		
+	}
 	
 }

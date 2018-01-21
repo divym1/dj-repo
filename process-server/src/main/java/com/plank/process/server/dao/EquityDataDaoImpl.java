@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.plank.process.server.model.ADXDataDO;
 import com.plank.process.server.model.Decimal;
 import com.plank.process.server.model.EquityDataDO;
+import com.plank.process.server.model.UltiOsciDO;
 
 @Component
 @Qualifier("equityDataDao")
@@ -110,7 +111,37 @@ public class EquityDataDaoImpl implements EquityDataDao {
 																	
 				args, types);
 	}
-	
+
+	public void insertUltiOsci(UltiOsciDO ultiOsciDO){
+		
+		Object[] args = new Object[] { ultiOsciDO.getSymbol(), 
+									ultiOsciDO.getValueDate(),
+									ultiOsciDO.getUoValue().toDouble(), 
+									ultiOsciDO.getBuyingPressure().toDouble(),
+									ultiOsciDO.getTrueRange().toDouble(),
+									ultiOsciDO.getDay7Avg().toDouble(),
+									ultiOsciDO.getDay14Avg().toDouble(), 
+									ultiOsciDO.getDay28Avg().toDouble(),
+									new Timestamp(System.currentTimeMillis())
+									};
+
+		int[] types = new int[] { Types.VARCHAR,
+									Types.DATE, 
+									Types.DOUBLE,
+									Types.DOUBLE,
+									Types.DOUBLE,
+									Types.DOUBLE,
+									Types.DOUBLE,
+									Types.DOUBLE,
+									Types.TIMESTAMP};
+							
+		jdbcTemplate.update("insert into plankdb.ultimate_osci_data values (?, ?, ?, ?,"
+																	+ " ?, ?, ?, ?,"
+																	+ " ? ) ",
+																	
+				args, types);
+	}
+
 	/**
 	 * 
 	 * @param symbol
@@ -219,12 +250,10 @@ public class EquityDataDaoImpl implements EquityDataDao {
 
 	public List<String> getAllSymbolsForLargeCap() {
 		
-		String query = "select  distinct symbol from plankdb.equity_data where total_trd_qty >= 10000000 and open_price > 50";
+		String query = "select  distinct symbol from plankdb.equity_data where total_trd_qty >= 100000 and open_price > 50";
 		List<String> symbolList = jdbcTemplate.queryForList(query, String.class);
 		return symbolList;
 	}
-	
-	
 	
 	class EquityDataMapper implements RowMapper<EquityDataDO> {
 
@@ -252,8 +281,14 @@ public class EquityDataDaoImpl implements EquityDataDao {
 
 	@Override
 	public List<ADXDataDO> getADXRecord(String symbol, Date date) {
-		// TODO Auto-generated method stub
-		return null;
+	String query = "select * from plankdb.adx_indicator_data where symbol = ? and value_date = ?";
+		
+		int[] types = new int[] { Types.VARCHAR , Types.DATE};
+		Object[] args = new Object[] { symbol , date};
+		
+		List<ADXDataDO> symbolList = jdbcTemplate.query(query,args, types , new AdxDoDataMapper());
+		
+		return symbolList;
 	}
 	
 	public List<ADXDataDO> getADXRecord(String symbol) {
@@ -265,7 +300,6 @@ public class EquityDataDaoImpl implements EquityDataDao {
 		List<ADXDataDO> symbolList = jdbcTemplate.query(query,args, types , new AdxDoDataMapper());
 		
 		return symbolList;
-		
 	}
 	
 	class AdxDoDataMapper implements RowMapper<ADXDataDO> {
@@ -295,6 +329,32 @@ public class EquityDataDaoImpl implements EquityDataDao {
 			return adxDataDO;
 		}
 	}
-	
+
+	@Override
+	public List<UltiOsciDO> getUORecord(String symbol, Date date) {
+	String query = "select * from plankdb.ultimate_osci_data where symbol = ? and value_date = ?";
+		
+		int[] types = new int[] { Types.VARCHAR , Types.DATE};
+		Object[] args = new Object[] { symbol , date};
+		
+		List<UltiOsciDO> symbolList = jdbcTemplate.query(query,args, types , new UltiOsciDataMapper());
+		
+		return symbolList;
+	}
+
+
+	class UltiOsciDataMapper implements RowMapper<UltiOsciDO> {
+		@Override
+		public UltiOsciDO mapRow(ResultSet resultSet, int arg1) throws SQLException {
+
+			UltiOsciDO ultiOsciDO = new UltiOsciDO();
+			ultiOsciDO.setSymbol(resultSet.getString("symbol"));
+			ultiOsciDO.setValueDate(resultSet.getDate("value_date"));
+			
+			ultiOsciDO.setUoValue(Decimal.valueOf(resultSet.getDouble("uo_value")));
+			
+			return ultiOsciDO;
+		}
+	}
 
 }

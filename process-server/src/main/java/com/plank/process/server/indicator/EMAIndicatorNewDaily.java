@@ -1,8 +1,10 @@
 package com.plank.process.server.indicator;
 
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -39,15 +41,20 @@ public class EMAIndicatorNewDaily {
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
 		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 
-		EquityDataDO currentDateDO = new  EquityDataDO("ASHOKLEY", "EQ", Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO,
-				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, null, Decimal.ZERO, "ASK", new Date(System.currentTimeMillis()),
-				Decimal.ZERO,Decimal.ZERO);
-		
 		EMAIndicatorNewDaily daily = new EMAIndicatorNewDaily();
-		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", null);
 		
-		daily.calculateEMADaily(currentDateDO, equityDataList, 9);
+		Calendar cal = new GregorianCalendar(); 
+
+		for(int i= 2; i <=30 ; i ++) {
 		
+			cal.set(2017, 10, i);
+			List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", new Date(cal.getTimeInMillis()));
+
+			if(equityDataList != null && equityDataList.size()> 0) {
+				EquityDataDO currentDateDO = equityDataList.get(0);
+				daily.calculateEMADaily(currentDateDO, equityDataList, 9);
+			}
+		}
 	}
 
 	class DataComparator implements Comparator<EquityDataDO> {
