@@ -7,7 +7,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>process-server</module>
-		<module>process-starter</module>
 	</modules>
 
 	<build>

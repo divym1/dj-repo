@@ -342,6 +342,13 @@ public class EquityDataDaoImpl implements EquityDataDao {
 		return symbolList;
 	}
 
+	@Override
+	public List<UltiOsciDO> getAllUORecord() {
+	String query = "select * from plankdb.ultimate_osci_data";
+		List<UltiOsciDO> symbolList = jdbcTemplate.query(query, new UltiOsciDataMapper());
+		return symbolList;
+	}
+
 
 	class UltiOsciDataMapper implements RowMapper<UltiOsciDO> {
 		@Override
@@ -350,8 +357,13 @@ public class EquityDataDaoImpl implements EquityDataDao {
 			UltiOsciDO ultiOsciDO = new UltiOsciDO();
 			ultiOsciDO.setSymbol(resultSet.getString("symbol"));
 			ultiOsciDO.setValueDate(resultSet.getDate("value_date"));
-			
+			ultiOsciDO.setDay14Avg(Decimal.valueOf(resultSet.getDouble("day14_avg")));
+			ultiOsciDO.setDay28Avg(Decimal.valueOf(resultSet.getDouble("day28_avg")));
+			ultiOsciDO.setDay7Avg(Decimal.valueOf(resultSet.getDouble("day7_avg")));
 			ultiOsciDO.setUoValue(Decimal.valueOf(resultSet.getDouble("uo_value")));
+			ultiOsciDO.setDay14Avg(Decimal.valueOf(resultSet.getDouble("day14_avg")));
+			ultiOsciDO.setTrueRange(Decimal.valueOf(resultSet.getDouble("true_range")));
+			ultiOsciDO.setBuyingPressure(Decimal.valueOf(resultSet.getDouble("bp_value")));
 			
 			return ultiOsciDO;
 		}

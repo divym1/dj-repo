@@ -39,4 +39,6 @@ public interface EquityDataDao {
 	public List<ADXDataDO> getADXRecord(String symbol);
 	
 	public List<UltiOsciDO> getUORecord(String symbol, Date date);
+	
+	public List<UltiOsciDO> getAllUORecord();
 }

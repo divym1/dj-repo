@@ -26,8 +26,19 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 	 * @param timeFrame
 	 * @return
 	 */
-	public Decimal calculateADX(EquityDataDO currentDateDO, List<EquityDataDO> listOfPrevEquData, int timeFrame, EquityDataDao equityDataDao) {
+	public Decimal calculateADX(EquityDataDO currentDateDO, List<EquityDataDO> listOfPrevEquData, EquityDataDao equityDataDao, int timeFrame) {
 
+		if(listOfPrevEquData.size() < 1) {
+			System.out.println("Not able to calculate ADX for this. Creating zero value record. ");
+			
+			ADXDataDO adxDataDONoValue = new ADXDataDO();
+			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
+			adxDataDONoValue.setValueDate(currentDateDO.getValueDate());
+			
+			equityDataDao.insertADXRecord(adxDataDONoValue);
+			return Decimal.ZERO;
+		}
+		
 		EquityDataDO prevDataDO = listOfPrevEquData.get(0);
 
 		// Calculate TR
@@ -50,6 +61,20 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		List<ADXDataDO > adxDataList = equityDataDao.getADXRecord(currentDateDO.getSymbol());
 
 		Collections.sort(adxDataList, new AdxDataComparatorDescending());
+		
+		if(adxDataList.size() < timeFrame) {
+		
+			System.out.println("Not able to calculate ADX for this. Creating zero value record. ");
+			
+			ADXDataDO adxDataDONoValue = new ADXDataDO();
+			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
+			adxDataDONoValue.setValueDate(currentDateDO.getValueDate());
+			
+			equityDataDao.insertADXRecord(adxDataDONoValue);
+			
+			return Decimal.ZERO;
+			
+		}
 		
 		for (int i = 0; i < timeFrame; i ++) {
 			trPeriod = trPeriod.plus(adxDataList.get(i).getTrPeriod());
@@ -109,7 +134,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		
 		System.out.println(adxDataDO);
-//		equityDataDao.insertADXRecord(adxDataDO);
+		equityDataDao.insertADXRecord(adxDataDO);
 		
 		return adxToday;
 	}
@@ -130,7 +155,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 			if(equityDataList != null && equityDataList.size()> 0) {
 				EquityDataDO currentDateDO = equityDataList.get(0);
-				adxIndicatorDaily.calculateADX(currentDateDO, equityDataList, 20, equityDataDao);
+				adxIndicatorDaily.calculateADX(currentDateDO, equityDataList,  equityDataDao, 20);
 			}
 		}		
 		

@@ -42,7 +42,7 @@ public class CCIIndicator {
 		final Decimal average = currentDateDO.getSmaValue();
 		
 		for (int i = 0; i < timeFrame; i++) {
-			absoluteDeviations = absoluteDeviations.plus(listOfPrevEquData.get(i).getTypicalPrice().minus(average).abs());
+//			absoluteDeviations = absoluteDeviations.plus(listOfPrevEquData.get(i).getTypicalPrice().minus(average).abs());
 		}
 		
 		return absoluteDeviations.dividedBy(Decimal.valueOf(timeFrame));
