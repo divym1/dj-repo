@@ -117,14 +117,17 @@ public class CsvTicksLoader {
 
 					EquityDataDO equityDataDO = new EquityDataDO(symbol, type, open, close,
 							high, low, last, prevClose,	totalTradingQty, totalTradingVal, null, totalTrades, isin, date,
-							Decimal.ZERO, Decimal.ZERO);
+							Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 
 					List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
 					
-					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
-					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
+//					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
+//					
+//					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 9);
+//					
+//					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
 					
-					equityDataDao.insertIntoEquityData(equityDataDO);
+//					equityDataDao.insertIntoEquityData(equityDataDO);
 					
 					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, equityDataDao, 14);
 					

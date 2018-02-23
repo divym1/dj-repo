@@ -29,7 +29,9 @@ public class IndicatorAlgo {
 
 		List<String> symbolList = equityDataDao.getAllSymbolsForLargeCap();
 		
-//		System.out.println("Large cap " + symbolList.size());
+//
+//		List<String> symbolList = new ArrayList<>();
+//		symbolList.add("BIOCON");
 		
 		List<String> matchedsymbols = new ArrayList<>();
 		
@@ -45,7 +47,6 @@ public class IndicatorAlgo {
 
 			if(dataList != null && dataList.size() > 0) {
 				EquityDataDO equityDataDO = dataList.get(0);
-//				System.out.println("val date "+ equityDataDO.getValueDate());
 				Decimal smaValue = equityDataDO.getSmaValue();
 				Decimal emaValue = equityDataDO.getEmaValue();
 
@@ -63,17 +64,38 @@ public class IndicatorAlgo {
 //							System.out.println("Same condition yesterday also ..");
 						} else {
 							matchedsymbols.add(symbol);
-							System.out.println("Matched : " + symbol + " - SMA :  "+ smaValue +
-									" - EMA " + emaValue + " - Prev SMA "+ smaValuePrev + "- Prev EMA "+ emaValuePrev);
+							System.out.println("Matched : " + symbol + " - SMA :  "+ smaValue +	" - EMA " + emaValue + " - Prev SMA "+ smaValuePrev + "- Prev EMA "+ emaValuePrev);
 						}
 					}
 				} 
+				
+				Decimal smaValue9Day = equityDataDO.getSmaValue9Day();
+				
+				if(emaValue.minus(smaValue9Day).isGreaterThanOrEqual(Decimal.ONE) ) {
+					
+					List<EquityDataDO> prevData = equityDataDao.getEquityData(symbol, new Date(calPrev.getTimeInMillis()));
+
+					if(prevData != null && prevData.size() > 0) {
+						EquityDataDO equityDataDOPrev = prevData.get(0);
+						
+						Decimal smaValue9DayPrev = equityDataDOPrev.getSmaValue9Day();
+						Decimal emaValuePrev = equityDataDOPrev.getEmaValue();
+
+						if(emaValuePrev.minus(smaValue9DayPrev).isGreaterThanOrEqual(Decimal.ONE) ) {
+//							System.out.println("Same condition yesterday also ..");
+						} else {
+							matchedsymbols.add(symbol);
+							System.out.println("Matched : " + symbol + " - SMA 9 DAY :  "+ smaValue +	" - EMA " + emaValue + " - Prev SMA 9 DAY "+ smaValue9DayPrev + "- Prev EMA "+ emaValuePrev);
+						}
+					}
+				} 
+				
+				
 			}
 		}
 
 		for (String matchedSymbol : matchedsymbols) {
-			System.out.println("Matched Symbol : " +matchedSymbol);
-
+			
 			List<ADXDataDO> adxDataDOs = equityDataDao.getADXRecord(matchedSymbol, new Date(cal.getTimeInMillis()));
 			
 			if(adxDataDOs != null && adxDataDOs.size() >  0) {
@@ -85,13 +107,13 @@ public class IndicatorAlgo {
 				
 				if (adxValue.isGreaterThan(Decimal.valueOf(20))) {
 					
-					System.out.println("ADX Values confirmed");
+					System.out.println("ADX Values confirmed for : "+ matchedSymbol + " || ADX IS : " + adxValue);
 					
 					Decimal diPlus = adxDataDO.getDiPlus();
 					
 					if (diPlus.isGreaterThan(Decimal.valueOf(20))) {
 						
-						System.out.println("DI Plus confirmed ");
+						System.out.println("DI Plus confirmed for :  "+ matchedSymbol + " || DI Plus IS : " + diPlus);
 					}
 				}
 			}

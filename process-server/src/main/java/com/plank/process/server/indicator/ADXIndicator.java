@@ -28,8 +28,11 @@ public class ADXIndicator extends BaseAdxIndicator {
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
 		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 
-		List<String> list = equityDataDao.getAllSymbols();
+//		List<String> list = equityDataDao.getAllSymbols();
 
+		List<String> list = new ArrayList<>();
+		list.add("BIOCON");
+		
 		for (String symbol : list) {
 
 			List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
@@ -38,9 +41,8 @@ public class ADXIndicator extends BaseAdxIndicator {
 				System.out.println("NO DATA");
 				continue;
 			}
-			Collections.sort(equityDataList, new DataComparatorAscending());
-
 			
+			Collections.sort(equityDataList, new DataComparatorAscending());
 			
 			EquityDataDO prevDataDO0 = equityDataList.get(0);
 			EquityDataDO currentDateDO1 = equityDataList.get(1);
@@ -140,7 +142,11 @@ public class ADXIndicator extends BaseAdxIndicator {
 
 				// Calculate todays DX
 				dxToday = (diDiff.dividedBy(diSum)).multipliedBy(Decimal.HUNDRED);
-
+				
+				if(dxToday.isNaN()) {
+					dxToday = Decimal.ZERO;
+				}
+				
 				
 				adxDataDO.setAdxPeriod(adxPeriod);
 				adxDataDO.setAdxToday(adxToday);
@@ -164,13 +170,13 @@ public class ADXIndicator extends BaseAdxIndicator {
 			Decimal dxFor14Day = Decimal.ZERO;
 
 			while (k <= 29) {
+				System.out.println("calculating 29 days data");
 				ADXDataDO adxDataDO = adxDataList.get(k);
 				dxFor14Day = dxFor14Day.plus(adxDataDO.getDxToday());
 				k++;
 			}
 
 			Decimal avgOfDx = dxFor14Day.dividedBy(Decimal.valueOf(14));
-
 
 			adxDataList.get(29).setAdxToday(avgOfDx);
 
@@ -179,6 +185,11 @@ public class ADXIndicator extends BaseAdxIndicator {
 				Decimal adxPrev = adxDataList.get(i - 1).getAdxToday();
 
 				Decimal adxToday = ((adxPrev.multipliedBy(Decimal.valueOf(timeframe - 1))).plus(dxToday)).dividedBy(Decimal.valueOf(timeframe));
+				
+				if(adxToday.isNaN()) {
+					adxToday = Decimal.ZERO;
+				}
+				
 				adxDataList.get(i).setAdxToday(adxToday);
 
 			}

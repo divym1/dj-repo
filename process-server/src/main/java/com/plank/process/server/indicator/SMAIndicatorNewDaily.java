@@ -40,8 +40,12 @@ public class SMAIndicatorNewDaily {
 		Decimal avg = sum.dividedBy(Decimal.valueOf(timeFrame));
 		
 		System.out.println(timeFrame + " --- SMA  : " + sum + " - " + avg + " - " + currentDateDO.getValueDate());
-		
-		currentDateDO.setSmaValue(avg);
+
+		if(timeFrame == 20) {
+			currentDateDO.setSmaValue(avg);
+		} else {
+			currentDateDO.setSmaValue9Day(avg);
+		}
 
 	}
 
@@ -52,7 +56,7 @@ public class SMAIndicatorNewDaily {
 
 		EquityDataDO currentDateDO = new  EquityDataDO("ASHOKLEY", "EQ", Decimal.ZERO, Decimal.valueOf(129.15), Decimal.ZERO, Decimal.ZERO,
 				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, null, Decimal.ZERO, "ASK", new Date(System.currentTimeMillis()),
-				Decimal.ZERO, Decimal.ZERO);
+				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 		
 		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", null);
 		

@@ -21,6 +21,8 @@ public interface EquityDataDao {
 	public List<EquityDataDO> getAllEquityData();
 	
 	public void updateSMA(String symbol, Date valueDate, Decimal smaValue) ;
+	
+	public void updateSMA9Day(String symbol, Date valueDate, Decimal smaValue) ;
 
 	public int[] updateEMA(List<EquityDataDO> dos) ;
 	

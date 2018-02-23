@@ -29,7 +29,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 	public Decimal calculateADX(EquityDataDO currentDateDO, List<EquityDataDO> listOfPrevEquData, EquityDataDao equityDataDao, int timeFrame) {
 
 		if(listOfPrevEquData.size() < 1) {
-			System.out.println("Not able to calculate ADX for this. Creating zero value record. ");
+			System.out.println(currentDateDO.getSymbol() + " - Not able to calculate ADX for this as no previous equity data. Creating zero value record. " );
 			
 			ADXDataDO adxDataDONoValue = new ADXDataDO();
 			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
@@ -64,7 +64,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		
 		if(adxDataList.size() < timeFrame) {
 		
-			System.out.println("Not able to calculate ADX for this. Creating zero value record. ");
+			System.out.println(currentDateDO.getSymbol() + " - Not able to calculate ADX for this as not sufficient data to calculate ADX. Creating zero value record. ");
 			
 			ADXDataDO adxDataDONoValue = new ADXDataDO();
 			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
@@ -104,12 +104,20 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		// Calculate todays DX
 		Decimal dxToday = diDiff.abs().dividedBy(diSum).multipliedBy(Decimal.HUNDRED);
 
+		if(dxToday.isNaN()) {
+			dxToday = Decimal.ZERO;
+		}
+		
 		// calculate ADX
 
 		Decimal adxPrev = adxDataList.get(0).getAdxToday();
 		
 		Decimal adxToday = ((adxPrev.multipliedBy(Decimal.valueOf(timeFrame - 1))).plus(dxToday)).dividedBy(Decimal.valueOf(timeFrame));
 
+		if(adxToday.isNaN()) {
+			adxToday = Decimal.ZERO;
+		}
+		
 		ADXDataDO adxDataDO = new ADXDataDO();
 		
 		adxDataDO.setDmMinusCurrent(dmMinusCurrent);
@@ -131,9 +139,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		adxDataDO.setDxToday(dxToday);
 		adxDataDO.setTrPeriod(trPeriod);
 		adxDataDO.setTrSmooth(trSmooth);
-
 		
-		System.out.println(adxDataDO);
 		equityDataDao.insertADXRecord(adxDataDO);
 		
 		return adxToday;
