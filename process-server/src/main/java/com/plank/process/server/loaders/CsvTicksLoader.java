@@ -119,6 +119,7 @@ public class CsvTicksLoader {
 							high, low, last, prevClose,	totalTradingQty, totalTradingVal, null, totalTrades, isin, date,
 							Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 
+					
 					List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
 					
 //					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
