@@ -35,17 +35,24 @@ public class BaseAdxIndicator {
 		if(upMove.isGreaterThan(downMove) && upMove.isGreaterThan(Decimal.ZERO)) {
 			return upMove;
 		}
-		
+		    
 		return Decimal.ZERO;
 	}
 
 	public static Decimal getTrueRange(EquityDataDO equityDataDO) {
 
-		double min = Math.min(equityDataDO.getLow().toDouble(), equityDataDO.getPrevClosePrice().toDouble());
-		double maxHighPriClose = Math.max(equityDataDO.getHigh().toDouble(), equityDataDO.getPrevClosePrice().toDouble());
-		Decimal trToday = Decimal.valueOf(maxHighPriClose).minus(Decimal.valueOf(min));
+		Decimal highMinusLow = (equityDataDO.getHigh().minus(equityDataDO.getLow())).abs();
+		Decimal highMinusPrevClose = (equityDataDO.getHigh().minus(equityDataDO.getPrevClosePrice())).abs();
+		Decimal prevCloseMinusLow = (equityDataDO.getPrevClosePrice().minus(equityDataDO.getLow())).abs();
 		
-		return trToday;
+		
+		
+		double max1 = Math.max(highMinusLow.abs().toDouble(), highMinusPrevClose.abs().toDouble());
+		double max2 = Math.max(max1, prevCloseMinusLow.abs().toDouble());
+		
+//		System.out.println("highMinusLow "+ highMinusLow + " | highMinusPrevClose " + highMinusPrevClose + " | prevCloseMinusLow "+ prevCloseMinusLow + " | max2 " + max2) ;
+		
+		return Decimal.valueOf(max2);
 		
 	}
 

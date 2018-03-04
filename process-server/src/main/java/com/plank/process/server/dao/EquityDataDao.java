@@ -36,6 +36,8 @@ public interface EquityDataDao {
 	
 	public void insertADXRecord(ADXDataDO adxDataDO);
 	
+	public void updateCCIValue(String symbol, Date valueDate, Decimal cciValue, Decimal typicalPrice);
+	
 	public List<ADXDataDO> getADXRecord(String symbol, Date date);
 	
 	public List<ADXDataDO> getADXRecord(String symbol);

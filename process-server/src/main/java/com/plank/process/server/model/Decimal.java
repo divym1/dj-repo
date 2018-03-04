@@ -80,22 +80,22 @@ public final class Decimal implements Comparable<Decimal>, Serializable {
      */
     private Decimal(double val) {
         delegate = new BigDecimal(val, MATH_CONTEXT);
-        delegate = delegate.setScale(2, RoundingMode.HALF_UP);
+        delegate = delegate.setScale(5, RoundingMode.HALF_UP);
     }
 
     private Decimal(int val) {
         delegate = new BigDecimal(val, MATH_CONTEXT);
-        delegate = delegate.setScale(2, RoundingMode.HALF_UP);
+        delegate = delegate.setScale(5, RoundingMode.HALF_UP);
     }
 
     private Decimal(long val) {
         delegate = new BigDecimal(val, MATH_CONTEXT);
-        delegate = delegate.setScale(2, RoundingMode.HALF_UP);
+        delegate = delegate.setScale(5, RoundingMode.HALF_UP);
     }
     
 
     private Decimal(BigDecimal val) {
-        delegate = val.setScale(2, RoundingMode.HALF_UP);
+        delegate = val.setScale(5, RoundingMode.HALF_UP);
     }
 
     /**

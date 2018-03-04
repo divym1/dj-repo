@@ -31,7 +31,7 @@ public class EquityDataDaoImpl implements EquityDataDao {
 	public void insertIntoEquityData(EquityDataDO equityDataDO) {
 		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE,
 				Types.DOUBLE, Types.DOUBLE, Types.BIGINT, Types.DOUBLE, Types.TIMESTAMP, Types.BIGINT, Types.VARCHAR,
-				Types.DATE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE};
+				Types.DATE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE};
 
 		Object[] args = new Object[] { equityDataDO.getSymbol(),
 				equityDataDO.getSeries(),
@@ -49,11 +49,13 @@ public class EquityDataDaoImpl implements EquityDataDao {
 				equityDataDO.getValueDate(), 
 				equityDataDO.getSmaValue().toDouble(),
 				equityDataDO.getEmaValue().toDouble(),
-				equityDataDO.getSmaValue9Day().toDouble()
+				equityDataDO.getSmaValue9Day().toDouble(),
+				equityDataDO.getTypicalPrice(),
+				equityDataDO.getCciValue()
 				};
 
 		jdbcTemplate.update(
-				"insert into plankdb.equity_data values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?) ",
+				"insert into plankdb.equity_data values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ? , ?) ",
 				args, types);
 	}
 
@@ -168,6 +170,15 @@ public class EquityDataDaoImpl implements EquityDataDao {
 
 	}
 
+	public void updateCCIValue(String symbol, Date valueDate, Decimal cciValue, Decimal typicalPrice) {
+
+		int[] types = new int[] { Types.DOUBLE, Types.DOUBLE, Types.VARCHAR, Types.DATE };
+		Object[] args = new Object[] { typicalPrice.toDouble() , cciValue.toDouble(), symbol, valueDate };
+
+		jdbcTemplate.update("update plankdb.equity_data set typical_price = ? , cci_value = ? where symbol = ? and value_date = ? ", args, types);
+
+	}
+
 	public void updateADXParams(String symbol, Date valueDate, Decimal trueRange, Decimal plusDm, Decimal minusDM) {
 
 		int[] types = new int[] { Types.DOUBLE, Types.DOUBLE,Types.DOUBLE, Types.VARCHAR, Types.DATE };
@@ -200,7 +211,7 @@ public class EquityDataDaoImpl implements EquityDataDao {
 	public List<EquityDataDO> getEquityData(String symbol, Date date) {
 
 		String query = "select symbol, series, open_price, high_price, low_price, close_price, last_price, prev_close_price, "
-				+ " total_trd_qty, total_trd_val, today_date, total_trd, isin, value_date, DATE(value_date) AS VD, sma_value, ema_value, sma_value_9_day  "
+				+ " total_trd_qty, total_trd_val, today_date, total_trd, isin, value_date, DATE(value_date) AS VD, sma_value, ema_value, sma_value_9_day, typical_price, cci_value  "
 				+ " from plankdb.equity_data where symbol = ? ";
 
 		String DATE = " and value_date = ? ";
@@ -224,7 +235,7 @@ public class EquityDataDaoImpl implements EquityDataDao {
 	public List<EquityDataDO> getEquityDataForLargeCAP(String symbol, Date date) {
 
 		String query = "select symbol, series, open_price, high_price, low_price, close_price, last_price, prev_close_price, "
-				+ " total_trd_qty, total_trd_val, today_date, total_trd, isin, value_date, DATE(value_date) AS VD, sma_value, ema_value, sma_value_9_day "
+				+ " total_trd_qty, total_trd_val, today_date, total_trd, isin, value_date, DATE(value_date) AS VD, sma_value, ema_value, sma_value_9_day, typical_price, cci_value "
 				+ " from plankdb.equity_data where symbol = ? and total_trd_qty >= 1000000 and open_price > 50 ";
 
 		String DATE = " and value_date = ? ";
@@ -287,7 +298,9 @@ public class EquityDataDaoImpl implements EquityDataDao {
 					resultSet.getDate("value_date"), 
 					Decimal.valueOf(resultSet.getDouble("sma_value")),
 					Decimal.valueOf(resultSet.getDouble("ema_value")),
-					Decimal.valueOf(resultSet.getDouble("sma_value_9_day")));
+					Decimal.valueOf(resultSet.getDouble("sma_value_9_day")),
+					Decimal.valueOf(resultSet.getDouble("typical_price")),
+					Decimal.valueOf(resultSet.getDouble("cci_value")));
 			return equityData;
 		}
 	}

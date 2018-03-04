@@ -75,24 +75,24 @@ public class CsvTicksLoader {
 
 	/**
 	 * @return a time series from Apple Inc. ticks.
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public void loadCsvFile(File file) throws FileNotFoundException {
-		
+
 		InputStream stream = new FileInputStream(file);
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
 		InputStreamReader inputStreamReader = null;
 		CSVReader csvReader = null;
 		try {
-		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
-		inputStreamReader = new InputStreamReader(stream, Charset.forName("UTF-8"));
+			EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
+			inputStreamReader = new InputStreamReader(stream, Charset.forName("UTF-8"));
 
-		EMAIndicatorNewDaily emaIndicator = new EMAIndicatorNewDaily();
-		SMAIndicatorNewDaily smaIndicator = new SMAIndicatorNewDaily();
-		ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
-		UltimateOscillatorDaily ultimateOscillatorDaily = new UltimateOscillatorDaily();
-		
-		csvReader = new CSVReader(inputStreamReader, ',', '"', 1);
+			EMAIndicatorNewDaily emaIndicator = new EMAIndicatorNewDaily();
+			SMAIndicatorNewDaily smaIndicator = new SMAIndicatorNewDaily();
+			ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
+			UltimateOscillatorDaily ultimateOscillatorDaily = new UltimateOscillatorDaily();
+
+			csvReader = new CSVReader(inputStreamReader, ',', '"', 1);
 			String[] line;
 			while ((line = csvReader.readNext()) != null) {
 
@@ -115,24 +115,27 @@ public class CsvTicksLoader {
 					DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 					Date date = new Date((df.parse(dataDate)).getTime());
 
-					EquityDataDO equityDataDO = new EquityDataDO(symbol, type, open, close,
-							high, low, last, prevClose,	totalTradingQty, totalTradingVal, null, totalTrades, isin, date,
+					EquityDataDO equityDataDO = new EquityDataDO(symbol, type, open, close, high, low, last, prevClose,
+							totalTradingQty, totalTradingVal, null, totalTrades, isin, date, Decimal.ZERO, Decimal.ZERO,
 							Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 
-					
 					List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
-					
-//					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
-//					
-//					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 9);
-//					
-//					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
-					
-//					equityDataDao.insertIntoEquityData(equityDataDO);
-					
+
+					// smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO,
+					// equityDataList, 20);
+					//
+					// smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO,
+					// equityDataList, 9);
+					//
+					// emaIndicator.calculateEMADaily(equityDataDO,
+					// equityDataList, 9);
+
+					// equityDataDao.insertIntoEquityData(equityDataDO);
+
 					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, equityDataDao, 14);
-					
-//					ultimateOscillatorDaily.calculatUO(equityDataDO, equityDataDao);
+
+					// ultimateOscillatorDaily.calculatUO(equityDataDO,
+					// equityDataDao);
 
 				}
 			}

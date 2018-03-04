@@ -62,34 +62,20 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		Collections.sort(adxDataList, new AdxDataComparatorDescending());
 		
-		if(adxDataList.size() < timeFrame) {
-		
-			System.out.println(currentDateDO.getSymbol() + " - Not able to calculate ADX for this as not sufficient data to calculate ADX. Creating zero value record. ");
-			
-			ADXDataDO adxDataDONoValue = new ADXDataDO();
-			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
-			adxDataDONoValue.setValueDate(currentDateDO.getValueDate());
-			
-			equityDataDao.insertADXRecord(adxDataDONoValue);
-			
-			return Decimal.ZERO;
-			
-		}
-		
-		for (int i = 0; i < timeFrame; i ++) {
-			trPeriod = trPeriod.plus(adxDataList.get(i).getTrPeriod());
-			dmPlusPeriod = dmPlusPeriod.plus(adxDataList.get(i).getDmPlusCurrent());
-			dmMinusPeriod = dmMinusPeriod.plus(adxDataList.get(i).getDmMinusCurrent());
-		}
-
 		// Smoothening
 
-		Decimal trSmooth = trPeriod.minus((trPeriod.dividedBy(Decimal.valueOf(timeFrame)))).plus(trueRangeCurrent);
+		Decimal trPrev = adxDataList.get(1).getTrSmooth();
+		
+		Decimal trSmooth = (trPrev.minus((trPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(trueRangeCurrent)).abs();
 
-		Decimal dmPlusSmooth = dmPlusPeriod.minus((dmPlusPeriod.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmPlusCurrent);
+		Decimal dmPlusPrev = adxDataList.get(1).getDmPlusSmooth();
+		
+		Decimal dmPlusSmooth = (dmPlusPrev.minus((dmPlusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmPlusCurrent)).abs();
 
-		Decimal dmMinusSmooth = dmMinusPeriod.minus((dmMinusPeriod.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmMinusCurrent);
-
+		Decimal dmMinusPrev = adxDataList.get(1).getDmMinusSmooth();
+		
+		Decimal dmMinusSmooth = (dmMinusPrev.minus((dmMinusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmMinusCurrent)).abs();
+		
 
 		// calculate directional index
 
@@ -98,11 +84,11 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		// calculate the directional difference
 
-		Decimal diDiff = diPlus.minus(diMinus);
-		Decimal diSum = diPlus.plus(diMinus);
+		Decimal diDiff = (diPlus.minus(diMinus)).abs();
+		Decimal diSum = (diPlus.plus(diMinus)).abs();
 
 		// Calculate todays DX
-		Decimal dxToday = diDiff.abs().dividedBy(diSum).multipliedBy(Decimal.HUNDRED);
+		Decimal dxToday = diDiff.dividedBy(diSum).multipliedBy(Decimal.HUNDRED);
 
 		if(dxToday.isNaN()) {
 			dxToday = Decimal.ZERO;

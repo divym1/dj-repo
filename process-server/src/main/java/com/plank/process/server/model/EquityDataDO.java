@@ -28,5 +28,7 @@ public class EquityDataDO {
 	private Decimal smaValue;
 	private Decimal emaValue;
 	private Decimal smaValue9Day;
+	private Decimal typicalPrice;
+	private Decimal cciValue;
 	
 }

@@ -20,8 +20,8 @@ public class ADXDataDO {
 	private Decimal trueRangeCurrent= Decimal.ZERO;;
 	private Decimal dmPlusCurrent= Decimal.ZERO;;
 	private Decimal dmMinusCurrent= Decimal.ZERO;;
-	
-	
+	private Decimal diDiff= Decimal.ZERO;;
+	private Decimal diSum= Decimal.ZERO;;
 	
 	public ADXDataDO() {
 		super();
@@ -65,6 +65,26 @@ public class ADXDataDO {
 	public String getSymbol() {
 		return symbol;
 	}
+
+	public Decimal getDiDiff() {
+		return diDiff;
+	}
+
+
+	public void setDiDiff(Decimal diDiff) {
+		this.diDiff = diDiff;
+	}
+
+
+	public Decimal getDiSum() {
+		return diSum;
+	}
+
+
+	public void setDiSum(Decimal diSum) {
+		this.diSum = diSum;
+	}
+
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;

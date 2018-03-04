@@ -56,7 +56,7 @@ public class SMAIndicatorNewDaily {
 
 		EquityDataDO currentDateDO = new  EquityDataDO("ASHOKLEY", "EQ", Decimal.ZERO, Decimal.valueOf(129.15), Decimal.ZERO, Decimal.ZERO,
 				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, null, Decimal.ZERO, "ASK", new Date(System.currentTimeMillis()),
-				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
+				Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 		
 		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", null);
 		

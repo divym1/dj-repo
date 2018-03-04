@@ -1,5 +1,6 @@
 package com.plank.process.server.indicator;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,12 +22,13 @@ import org.springframework.context.support.AbstractApplicationContext;
 import com.opencsv.CSVReader;
 import com.plank.process.server.dao.EquityDataDao;
 import com.plank.process.server.dao.EquityDataDaoImpl;
+import com.plank.process.server.helper.DataComparatorAscending;
 import com.plank.process.server.loaders.CsvTicksLoader;
 import com.plank.process.server.model.Decimal;
 import com.plank.process.server.model.EquityDataDO;
 import com.plank.process.server.service.DaoController;
 
-public class CCIIndicator {
+public class CCIIndicatorDaily {
 
 	public void calculateCCI(EquityDataDao equityDataDao, List<EquityDataDO> listOfEquData, int timeFrame) {
 
@@ -61,19 +64,18 @@ public class CCIIndicator {
 			
 			Decimal meanDeviation = sumTypicalPriceMinus.dividedBy(Decimal.valueOf(timeFrame));
 
-			Decimal cciValue = Decimal.ZERO;
 			
 			if (!meanDeviation.isZero()) {
 	
 				Decimal val1 = currentDateDO.getTypicalPrice().minus(typicalPriceAvg);
 				Decimal val2 = meanDeviation.multipliedBy(Decimal.valueOf(0.015));
 				
-				cciValue = val1.dividedBy(val2);
+				System.out.println("Val1 "+ val1 + " || Val2 "+ val2);
+				
+				Decimal cciValue = val1.dividedBy(val2);
 
-				System.out.println(currentDateDO.getSymbol() + " | Value Date " + currentDateDO.getValueDate()+ " | typical price "+ currentDateDO.getTypicalPrice() + " | typicalPriceAvg "+ typicalPriceAvg   + "|  mean "+ meanDeviation + " | CCI " + cciValue );
+				System.out.println("Value Date " + currentDateDO.getValueDate()+ " | typical price "+ currentDateDO.getTypicalPrice() + " | typicalPriceAvg "+ typicalPriceAvg   + "|  mean "+ meanDeviation + " | CCI " + cciValue );
 			}
-			
-			equityDataDao.updateCCIValue(currentDateDO.getSymbol(), currentDateDO.getValueDate(), cciValue, currentDateDO.getTypicalPrice());
 		}
 
 	}
@@ -114,7 +116,7 @@ public class CCIIndicator {
 						Decimal.ZERO, Decimal.ZERO, null, Decimal.ZERO, null, date, Decimal.ZERO, Decimal.ZERO,
 						Decimal.ZERO, Decimal.ZERO, Decimal.ZERO);
 
-//				equityDataList.add(equityDataDO);
+				equityDataList.add(equityDataDO);
 				
 			}
 			
@@ -126,23 +128,8 @@ public class CCIIndicator {
 			e.printStackTrace();
 		} 
 
-		CCIIndicator cciIndicator = new CCIIndicator();
+		CCIIndicatorDaily cciIndicator = new CCIIndicatorDaily();
 	
-		List<String> list = equityDataDao.getAllSymbols();
-		
-		for (String symbol : list) {
-			
-			equityDataList = equityDataDao.getEquityData(symbol, null);
-			
-			if (equityDataList.size() < 30) {
-				System.out.println("NO DATA");
-				continue;
-			}
-
-			cciIndicator.calculateCCI(equityDataDao, equityDataList, 20);
-
-		}
-		
 		cciIndicator.calculateCCI(equityDataDao, equityDataList, 20);
 		
 	}
