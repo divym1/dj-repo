@@ -299,6 +299,5 @@ public class ADXIndicator extends BaseAdxIndicator {
 		
 			System.out.println("Error Symbol " + symbol);
 		}
-		
 	}
 }
