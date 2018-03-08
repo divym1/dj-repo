@@ -134,7 +134,7 @@ public class CsvTicksLoader {
 
 					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, equityDataDao, 14);
 					
-					cciIndicatorDaily.calculateCCI(equityDataDao, equityDataList, 20);
+					cciIndicatorDaily.calculateCCI(equityDataDO, equityDataDao, equityDataList, 20);
 
 					// ultimateOscillatorDaily.calculatUO(equityDataDO,
 					// equityDataDao);

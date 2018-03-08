@@ -17,17 +17,21 @@ import com.plank.process.server.service.DaoController;
 
 public class CCIIndicatorDaily {
 
-	public void calculateCCI(EquityDataDao equityDataDao, List<EquityDataDO> listOfEquData, int timeFrame) {
-
+	public void calculateCCI(EquityDataDO currentDateDO, EquityDataDao equityDataDao, List<EquityDataDO> listOfEquData, int timeFrame) {
+		
 		Collections.sort(listOfEquData, new DataComparatorDescending());
 
-		EquityDataDO currentDateDO = listOfEquData.get(0);
 		Decimal typicalPrice = calculateTypicalPrice(currentDateDO);
 		currentDateDO.setTypicalPrice(typicalPrice);
 
-		Decimal sumTypicalPrice = Decimal.ZERO;
+		if(listOfEquData.size() < timeFrame) {
+			equityDataDao.updateCCIValue(currentDateDO.getSymbol(), currentDateDO.getValueDate(), Decimal.ZERO, currentDateDO.getTypicalPrice());
+			return;
+		}
 
-		for (int i = 0; i < timeFrame; i++) {
+		Decimal sumTypicalPrice = currentDateDO.getTypicalPrice();
+
+		for (int i = 0; i < timeFrame - 1 ; i++) {
 			sumTypicalPrice = sumTypicalPrice.plus(listOfEquData.get(i).getTypicalPrice());
 		}
 
@@ -36,7 +40,7 @@ public class CCIIndicatorDaily {
 		
 		Decimal sumTypicalPriceMinus = Decimal.ZERO;
 
-		for (int i = 0; i < timeFrame; i++) {
+		for (int i = 0; i < timeFrame -1; i++) {
 			Decimal value = (listOfEquData.get(i).getTypicalPrice().minus(typicalPriceAvg)).abs();
 			sumTypicalPriceMinus = sumTypicalPriceMinus.plus(value);
 		}
@@ -82,9 +86,10 @@ public class CCIIndicatorDaily {
 		System.out.println(cal.getTime());
 
 		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("AJMERA", null);
+		Collections.sort(equityDataList, new DataComparatorDescending());
 
 
-		cciIndicator.calculateCCI(equityDataDao, equityDataList, 20);
+		cciIndicator.calculateCCI(equityDataList.get(0), equityDataDao, equityDataList, 20);
 
 	}
 
