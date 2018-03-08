@@ -45,6 +45,8 @@ import com.plank.process.server.dao.EquityDataDao;
 import com.plank.process.server.dao.EquityDataDaoImpl;
 import com.plank.process.server.helper.UODataComparatorDescending;
 import com.plank.process.server.indicator.ADXIndicatorDaily;
+import com.plank.process.server.indicator.CCIIndicator;
+import com.plank.process.server.indicator.CCIIndicatorDaily;
 import com.plank.process.server.indicator.EMAIndicatorNewDaily;
 import com.plank.process.server.indicator.SMAIndicatorNewDaily;
 import com.plank.process.server.indicator.UltimateOscillator;
@@ -91,6 +93,7 @@ public class CsvTicksLoader {
 			SMAIndicatorNewDaily smaIndicator = new SMAIndicatorNewDaily();
 			ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
 			UltimateOscillatorDaily ultimateOscillatorDaily = new UltimateOscillatorDaily();
+			CCIIndicatorDaily cciIndicatorDaily =  new CCIIndicatorDaily();
 
 			csvReader = new CSVReader(inputStreamReader, ',', '"', 1);
 			String[] line;
@@ -121,18 +124,17 @@ public class CsvTicksLoader {
 
 					List<EquityDataDO> equityDataList = equityDataDao.getEquityData(symbol, null);
 
-					// smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO,
-					// equityDataList, 20);
-					//
-					// smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO,
-					// equityDataList, 9);
-					//
-					// emaIndicator.calculateEMADaily(equityDataDO,
-					// equityDataList, 9);
+					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 20);
+					
+					smaIndicator.calulateSMAIndicatorNewDaily(equityDataDO, equityDataList, 9);
+					
+					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
 
-					// equityDataDao.insertIntoEquityData(equityDataDO);
+					equityDataDao.insertIntoEquityData(equityDataDO);
 
 					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, equityDataDao, 14);
+					
+					cciIndicatorDaily.calculateCCI(equityDataDao, equityDataList, 20);
 
 					// ultimateOscillatorDaily.calculatUO(equityDataDO,
 					// equityDataDao);

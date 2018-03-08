@@ -50,8 +50,8 @@ public class EquityDataDaoImpl implements EquityDataDao {
 				equityDataDO.getSmaValue().toDouble(),
 				equityDataDO.getEmaValue().toDouble(),
 				equityDataDO.getSmaValue9Day().toDouble(),
-				equityDataDO.getTypicalPrice(),
-				equityDataDO.getCciValue()
+				equityDataDO.getTypicalPrice().toDouble(),
+				equityDataDO.getCciValue().toDouble()
 				};
 
 		jdbcTemplate.update(
