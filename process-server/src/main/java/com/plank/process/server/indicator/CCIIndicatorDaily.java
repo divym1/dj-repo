@@ -53,14 +53,12 @@ public class CCIIndicatorDaily {
 			System.out.println("Val1 " + val1 + " || Val2 " + val2);
 
 			cciValue = val1.dividedBy(val2);
-
-			
 			
 		}
 
 		System.out.println("Value Date " + currentDateDO.getValueDate() + " | typical price " + currentDateDO.getTypicalPrice() + " | typicalPriceAvg " + typicalPriceAvg + "|  mean " + meanDeviation + " | CCI " + cciValue);
 		
-//		equityDataDao.updateCCIValue(currentDateDO.getSymbol(), currentDateDO.getValueDate(), cciValue, currentDateDO.getTypicalPrice());
+		equityDataDao.updateCCIValue(currentDateDO.getSymbol(), currentDateDO.getValueDate(), cciValue, currentDateDO.getTypicalPrice());
 	}
 
 	protected Decimal calculateTypicalPrice(EquityDataDO currentDateDO) {
