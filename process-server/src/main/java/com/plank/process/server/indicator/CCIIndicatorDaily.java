@@ -38,7 +38,7 @@ public class CCIIndicatorDaily {
 		Decimal typicalPriceAvg = sumTypicalPrice.dividedBy(Decimal.valueOf(timeFrame));
 
 		
-		Decimal sumTypicalPriceMinus = Decimal.ZERO;
+		Decimal sumTypicalPriceMinus = currentDateDO.getTypicalPrice().minus(typicalPriceAvg).abs();
 
 		for (int i = 0; i < timeFrame -1; i++) {
 			Decimal value = (listOfEquData.get(i).getTypicalPrice().minus(typicalPriceAvg)).abs();

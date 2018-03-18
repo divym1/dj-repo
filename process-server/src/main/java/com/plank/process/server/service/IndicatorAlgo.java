@@ -47,26 +47,22 @@ public class IndicatorAlgo {
 				Decimal smaValue = equityDataDO.getSmaValue();
 				Decimal emaValue = equityDataDO.getEmaValue();
 
-				if ((emaValue.minus(smaValue)).abs().isGreaterThanOrEqual(Decimal.ONE)) {
-
+				
+				if ((emaValue.minus(smaValue)).isGreaterThanOrEqual(Decimal.ZERO)) {
+					
 					List<EquityDataDO> prevData = equityDataDao.getEquityData(symbol, calPrev.getTime());
 
 					if (prevData != null && prevData.size() > 0) {
+					
 						EquityDataDO equityDataDOPrev = prevData.get(0);
 
 						Decimal smaValuePrev = equityDataDOPrev.getSmaValue();
 						Decimal emaValuePrev = equityDataDOPrev.getEmaValue();
 
-						if ((emaValuePrev.minus(smaValuePrev)).abs().isGreaterThanOrEqual(Decimal.ONE)) {
-
-						} else {
-							// System.out.println("Matched 20 Day : " + symbol + " - SMA : " + smaValue + "
-							// - EMA " + emaValue + " - Prev SMA " + smaValuePrev + "- Prev EMA " +
-							// emaValuePrev);
-							System.out.println("Validated " + equityDataDO.getSymbol());
+						if ((emaValuePrev.minus(smaValuePrev)).isLessThan(Decimal.ZERO)) {
 							matchedsymbols.add(equityDataDO);
-
 						}
+						
 					}
 				}
 
@@ -79,7 +75,7 @@ public class IndicatorAlgo {
 
 				Decimal smaValue9Day = equityDataDO.getSmaValue9Day();
 
-				if (emaValue.minus(smaValue9Day).isGreaterThanOrEqual(Decimal.ONE)) {
+				if ((emaValue.minus(smaValue9Day)).isGreaterThanOrEqual(Decimal.ZERO)) {
 
 					List<EquityDataDO> prevData = equityDataDao.getEquityData(symbol, calPrev.getTime());
 
@@ -89,14 +85,8 @@ public class IndicatorAlgo {
 						Decimal smaValue9DayPrev = equityDataDOPrev.getSmaValue9Day();
 						Decimal emaValuePrev = equityDataDOPrev.getEmaValue();
 
-						if (emaValuePrev.minus(smaValue9DayPrev).isGreaterThanOrEqual(Decimal.ONE)) {
-
-						} else {
+						if ((emaValuePrev.minus(smaValue9DayPrev)).isLessThan(Decimal.ZERO)) {
 							matchedsymbols9DaySMA.add(equityDataDO);
-							System.out.println("Validated for 9 day SMA " + equityDataDO.getSymbol());
-							// System.out.println("Matched 9 Day : " + symbol + " - SMA 9 DAY : " +
-							// smaValue9Day + " - EMA " + emaValue + " - Prev SMA 9 DAY " + smaValue9DayPrev
-							// + "- Prev EMA " + emaValuePrev);
 						}
 					}
 				}
@@ -106,7 +96,7 @@ public class IndicatorAlgo {
 		for (EquityDataDO matchedSymbol : matchedsymbols) {
 
 			System.out.println("Matched 20 Day : " + matchedSymbol.getSymbol() + " - SMA :  "
-					+ matchedSymbol.getSmaValue() + " - EMA " + matchedSymbol.getEmaValue());
+					+ matchedSymbol.getSmaValue() + " - EMA " + matchedSymbol.getEmaValue() + " | Closing Price " + matchedSymbol.getClosePrice());
 			// + " - Prev SMA " + matchedSymbol.getsma + "- Prev EMA " + emaValuePrev);
 
 			List<ADXDataDO> adxDataDOs = equityDataDao.getADXRecord(matchedSymbol.getSymbol(), cal.getTime());
@@ -150,7 +140,7 @@ public class IndicatorAlgo {
 		for (EquityDataDO matchedSymbol : matchedsymbols9DaySMA) {
 
 			System.out.println("Matched 9 Day : " + matchedSymbol.getSymbol() + " - SMA 9 DAY :  "
-					+ matchedSymbol.getSmaValue9Day() + " - EMA " + matchedSymbol.getEmaValue());
+					+ matchedSymbol.getSmaValue9Day() + " - EMA " + matchedSymbol.getEmaValue()+ " | Closing Price " + matchedSymbol.getClosePrice()) ;
 
 			List<ADXDataDO> adxDataDOs = equityDataDao.getADXRecord(matchedSymbol.getSymbol(),
 					new Date(cal.getTimeInMillis()));
@@ -192,6 +182,8 @@ public class IndicatorAlgo {
 
 			if (dataList != null && dataList.size() > 0) {
 
+				if (dataListPrev != null && dataListPrev.size() > 0) {
+				
 				EquityDataDO equityDataDO = dataList.get(0);
 				EquityDataDO equityDataDOPrev = dataListPrev.get(0);
 
@@ -214,6 +206,7 @@ public class IndicatorAlgo {
 					}
 				
 				}
+			}
 
 		}
 

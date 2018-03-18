@@ -131,7 +131,7 @@ public class CsvTicksLoader {
 					emaIndicator.calculateEMADaily(equityDataDO, equityDataList, 9);
 
 					equityDataDao.insertIntoEquityData(equityDataDO);
-
+					
 					adxIndicatorDaily.calculateADX(equityDataDO, equityDataList, equityDataDao, 14);
 					
 					cciIndicatorDaily.calculateCCI(equityDataDO, equityDataDao, equityDataList, 20);

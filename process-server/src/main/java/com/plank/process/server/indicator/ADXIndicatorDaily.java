@@ -1,9 +1,6 @@
 package com.plank.process.server.indicator;
 
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,7 +39,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		Collections.sort(listOfPrevEquData, new DataComparatorDescending());
 		
-		EquityDataDO prevDataDO = listOfPrevEquData.get(1);
+		EquityDataDO prevDataDO = listOfPrevEquData.get(0);
 
 		// Calculate TR
 		Decimal trueRangeCurrent = getTrueRange(currentDateDO);
@@ -66,7 +63,9 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 			System.out.println(currentDateDO.getSymbol() + " - Not able to calculate ADX for this as no previous equity data. Creating zero value record. ");
 
 			ADXDataDO adxDataDONoValue = new ADXDataDO();
+			
 			adxDataDONoValue.setSymbol(currentDateDO.getSymbol());
+			
 			adxDataDONoValue.setValueDate(currentDateDO.getValueDate());
 
 			equityDataDao.insertADXRecord(adxDataDONoValue);
@@ -80,20 +79,20 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		Decimal trPrev = adxDataList.get(0).getTrSmooth();
 
-		Decimal trSmooth = (trPrev.minus((trPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(trueRangeCurrent)).abs();
+		Decimal trSmooth = (trPrev.minus((trPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(trueRangeCurrent));
 
 		Decimal dmPlusPrev = adxDataList.get(0).getDmPlusSmooth();
 
-		Decimal dmPlusSmooth = (dmPlusPrev.minus((dmPlusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmPlusCurrent)).abs();
+		Decimal dmPlusSmooth = (dmPlusPrev.minus((dmPlusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmPlusCurrent));
 
-		Decimal dmMinusPrev = adxDataList.get(0).getDmMinusSmooth();
+		Decimal dmMinusPrev = adxDataList.get(0).getDmMinusPeriod();
 
-		Decimal dmMinusSmooth = (dmMinusPrev.minus((dmMinusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmMinusCurrent)).abs();
+		Decimal dmMinusSmooth = (dmMinusPrev.minus((dmMinusPrev.dividedBy(Decimal.valueOf(timeFrame)))).plus(dmMinusCurrent));
 
 		// calculate directional index
 
-		Decimal diPlus = dmPlusSmooth.dividedBy(trSmooth).multipliedBy(Decimal.HUNDRED);
-		Decimal diMinus = dmMinusSmooth.dividedBy(trSmooth).multipliedBy(Decimal.HUNDRED);
+		Decimal diPlus = (dmPlusSmooth.dividedBy(trSmooth)).multipliedBy(Decimal.HUNDRED);
+		Decimal diMinus = (dmMinusSmooth.dividedBy(trSmooth)).multipliedBy(Decimal.HUNDRED);
 
 		// calculate the directional difference
 
@@ -102,7 +101,7 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 
 		
 		// Calculate todays DX
-		Decimal dxToday = diDiff.dividedBy(diSum).multipliedBy(Decimal.HUNDRED);
+		Decimal dxToday = (diDiff.dividedBy(diSum)).multipliedBy(Decimal.HUNDRED);
 
 		if (dxToday.isNaN()) {
 			dxToday = Decimal.ZERO;
@@ -155,20 +154,22 @@ public class ADXIndicatorDaily extends BaseAdxIndicator {
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(DaoController.class);
 		EquityDataDao equityDataDao = (EquityDataDao) context.getBean(EquityDataDaoImpl.class);
 
-		Calendar cal = new GregorianCalendar();
-
 		ADXIndicatorDaily adxIndicatorDaily = new ADXIndicatorDaily();
-
-		cal.set(2018, 0, 17);
 		
-		System.out.println(cal.getTime());
-		
-		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("ASHOKLEY", null);
+		List<EquityDataDO> equityDataList = equityDataDao.getEquityData("BIOCON", null);
 
 		Collections.sort(equityDataList, new DataComparatorDescending());
 		
 		EquityDataDO currentDateDO = equityDataList.get(0);
 		
+		System.out.println("current date 1 "+ currentDateDO.getValueDate());
+		 
+		equityDataList.remove(0);
+		
+		currentDateDO = equityDataList.get(0);
+		
+		System.out.println("current date 2 "+ currentDateDO.getValueDate());
+
 		adxIndicatorDaily.calculateADX(currentDateDO, equityDataList, equityDataDao, 20);
 
 	}
